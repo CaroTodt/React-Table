@@ -1,38 +1,16 @@
 import React, { useMemo } from 'react'
-import { useTable, useRowSelect } from 'react-table'
+import { useTable ,useColumnOrder} from 'react-table'
 import MOCK_DATA from '../components/MOCK_DATA.json'
 import { COLUMNS, GROUPED_COLUMNS } from '../components/columns'
 import './table.css'
-import {Checkbox} from '../components/Checkbox'
 
-export const RowSelection = () => {
+export const ColumnOrder = () => {
     const columns = useMemo(() => COLUMNS, [])
     const data = useMemo(() => MOCK_DATA, [])
     const tableInstance = useTable({
         columns,
         data
-    }, useRowSelect,
-    (hooks)=>{
-        hooks.visibleColumns.push((columns)=>{
-            return[
-                {
-                    id:'selection',
-                    Header: ({getToggleAllRowsSelectedProps})=>(
-                        <Checkbox {...getToggleAllRowsSelectedProps()}/>
-                    ),
-                    Cell:({row})=>(
-                        <Checkbox {...row.getToggleRowSelectedProps()}/>
-                    )
-                                },
-                                ...columns
-            ]
-                
-            
-        })
-
-    })
-
-
+    },useColumnOrder)
 
     const {
         getTableProps,
@@ -41,12 +19,17 @@ export const RowSelection = () => {
         footerGroups,
         rows,
         prepareRow,
-        selectedFlatRows,
+        setColumnOrder
     } = tableInstance
 
-    const firstPageRows = rows.slice(0,10)
+const changeOrder = () =>{
+    setColumnOrder(['id','first_name','last_name','phone','country','date_of_birth'])
+}
+
+
     return (
         <>
+        <button onClick={changeOrder}>Change column order</button>
         <table {...getTableProps()}>
             <thead>
                 {headerGroups.map(headerGroup => (
@@ -58,7 +41,7 @@ export const RowSelection = () => {
                 ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-                {firstPageRows.map(row => {
+                {rows.map(row => {
                     prepareRow(row)
                     return (
                         <tr {...row.getRowProps()}>
@@ -81,21 +64,7 @@ export const RowSelection = () => {
                         </tr>
                     ))}
             </tfoot>
-           
         </table>
-        <pre>
-                <code>
-                    {
-                        JSON.stringify(
-                            {
-                                selectedFlatRows:selectedFlatRows.map((row)=>row.original)
-                            },
-                            null,
-                            2
-                        )
-                    }
-                </code>
-            </pre>
         </>
     )
 }
